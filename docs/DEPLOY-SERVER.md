@@ -126,9 +126,10 @@ curl -sS http://127.0.0.1:8080/healthz
 **First-time (or after metadata changes):** apply Hasura metadata (needs [Hasura CLI](https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/)):
 
 ```bash
-export HASURA_GRAPHQL_ADMIN_SECRET='(same as in .env)'
 ./scripts/hasura-metadata-apply.sh
 ```
+
+The script sources **`.env`** from the repo root (same `HASURA_GRAPHQL_ADMIN_SECRET` as Compose). Override in the shell only if needed: `export HASURA_GRAPHQL_ADMIN_SECRET='…'`.
 
 Point `hasura/config.yaml` `endpoint` at `http://localhost:8080` (default in repo) when running on the server.
 
@@ -199,8 +200,7 @@ docker logs -f safro-hasura
 
 **Hardening:**
 
-- Keep **`HASURA_GRAPHQL_ENABLE_CONSOLE: "false"`** in production (set in `deploy/docker-compose.production.yml`).  
-- Do not proxy `/v1/metadata` or `/v1/console` publicly unless IP-restricted or behind VPN.  
+- **`HASURA_GRAPHQL_ENABLE_CONSOLE: "true"`** is set in `deploy/docker-compose.production.yml` so `/console` works when proxied. Restrict **`/console`**, **`/v1/metadata`**, and admin APIs at **nginx** (allowlist IP, basic auth, or VPN) if the host is on the public internet.  
 - Optional: `limit_req` in `http {}` for `/v1/graphql` (see comments in the nginx example).
 
 ---
