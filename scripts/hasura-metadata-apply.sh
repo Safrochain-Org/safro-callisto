@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Apply Hasura metadata from safro-callisto/hasura (CLI must see hasura/config.yaml).
-# Run from repo root: ./scripts/hasura-metadata-apply.sh
-# Loads ../.env when present so the secret matches docker compose --env-file .env (production).
+# Apply Hasura metadata. Run from repo root:
+#   ./scripts/hasura-metadata-apply.sh
+#
+# Loads .env so HASURA_GRAPHQL_ADMIN_SECRET matches docker compose --env-file .env.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 if [[ -f "${ROOT}/.env" ]]; then
@@ -10,6 +11,8 @@ if [[ -f "${ROOT}/.env" ]]; then
   source "${ROOT}/.env"
   set +a
 fi
-export HASURA_GRAPHQL_ADMIN_SECRET="${HASURA_GRAPHQL_ADMIN_SECRET:-myadminsecretkey}"
+SECRET="${HASURA_GRAPHQL_ADMIN_SECRET:-myadminsecretkey}"
 cd "${ROOT}/hasura"
-exec hasura metadata apply --endpoint http://localhost:8080
+exec hasura metadata apply \
+  --endpoint http://127.0.0.1:8080 \
+  --admin-secret "$SECRET"

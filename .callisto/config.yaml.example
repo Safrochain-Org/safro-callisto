@@ -42,7 +42,7 @@ parsing:
   average_block_time: 3s
 
 database:
-  url: postgres://callisto:password@localhost:5434/callisto?sslmode=disable&search_path=public
+  url: postgres://callisto:password@localhost:5432/callisto?sslmode=disable&search_path=public
   max_open_connections: 10
   max_idle_connections: 10
   partition_size: 100000
