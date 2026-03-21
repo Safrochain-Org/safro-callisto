@@ -1,0 +1,13 @@
+# Linux servers: use host network so Hasura can reach Postgres on 127.0.0.1:5432.
+# (Default bridge + host.docker.internal often fails: Postgres listens only on localhost.)
+#
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.hasura-hostnetwork.yml --env-file .env up -d
+#
+# Verify: curl -s http://127.0.0.1:8080/v1/version
+
+services:
+  hasura:
+    network_mode: host
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER:-callisto}:${POSTGRES_PASSWORD:-password}@127.0.0.1:5432/${POSTGRES_DB:-callisto}
+      ACTION_BASE_URL: http://127.0.0.1:3001
