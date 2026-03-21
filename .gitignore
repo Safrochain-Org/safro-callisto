@@ -6,12 +6,16 @@ vendor/
 *.toml
 *.json
 config.yaml
-# Allow repo-default Callisto config (other `config.yaml` paths stay ignored)
 !.callisto/config.yaml
+!.callisto/config.yaml.example
+.env
+
+# Logs
+logs/
+callisto-sync.log
+callisto.log
+callisto.pid
+*.pid
 
 # Coverage
 coverage.*
-
-# Local indexer logs (dev-stack.sh start-bg)
-logs/
-callisto-sync.log
