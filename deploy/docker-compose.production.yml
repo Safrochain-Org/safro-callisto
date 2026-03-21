@@ -1,4 +1,7 @@
 # Production overlay: bind DB + Hasura to localhost only; tighten Hasura flags.
+# Base `docker-compose.yml` does not publish ports, so this file is the only port mapping
+# (avoids Compose merging duplicate host ports with a dev-oriented base).
+#
 # Usage (from safro-callisto/):
 #   docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file .env up -d
 #

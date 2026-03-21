@@ -15,13 +15,15 @@ created using [Hasura](https://hasura.io/).
 
 ## Local stack (Safro fork)
 
+The repo includes **`.callisto/config.yaml`** (defaults match `docker-compose` Postgres on `localhost:5434`). Edit RPC/gRPC, `database.url`, and `parsing.start_height` as needed (see `docs/INDEXER-SYNC.md`). You can copy **`.callisto/config.yaml.example`** if you want a backup before editing.
+
 From this directory:
 
 | Command | What it does |
 |--------|----------------|
-| `./scripts/dev-stack.sh all` | Stop Callisto → `docker compose down -v` → `up -d` → wait Postgres & Hasura → Hasura metadata apply → Callisto **in background** (`logs/callisto-sync.log`) |
+| `./scripts/dev-stack.sh all` | Stop Callisto → `docker compose … down -v` → `up -d` (uses `docker-compose.yml` + `docker-compose.dev.yml`) → wait Postgres & Hasura → Hasura metadata apply → Callisto **in background** (`logs/callisto-sync.log`) |
 | `./scripts/dev-stack.sh reset` | Same as `all` but does **not** start Callisto |
-| `./scripts/dev-stack.sh up` | `docker compose up -d` (keeps data) → wait → Hasura metadata apply |
+| `./scripts/dev-stack.sh up` | `docker compose … up -d` (keeps data) → wait → Hasura metadata apply |
 | `./scripts/dev-stack.sh stop` | Stop Callisto only (Docker keeps running) |
 | `./scripts/dev-stack.sh build` | `make build` |
 | `./scripts/dev-stack.sh start` | Callisto in **foreground** (builds if `build/callisto` missing) |

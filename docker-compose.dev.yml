@@ -1,0 +1,14 @@
+# Published ports for local development. Base `docker-compose.yml` has no host ports
+# so production (`deploy/docker-compose.production.yml`) does not merge duplicate mappings.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# Or use ./scripts/dev-stack.sh (it passes these files).
+
+services:
+  postgres:
+    ports:
+      - "5434:5432"
+  hasura:
+    ports:
+      - "8080:8080"

@@ -3,10 +3,10 @@
 # Run from safro-callisto/: ./scripts/dev-stack.sh <command>
 #
 # Commands:
-#   all       Stop Callisto → docker compose down -v → up -d → wait Postgres & Hasura →
-#             hasura metadata apply → Callisto in background (logs/callisto-sync.log)
+#   all       Stop Callisto → docker compose … down -v → up -d (docker-compose.yml + docker-compose.dev.yml) →
+#             wait Postgres & Hasura → hasura metadata apply → Callisto in background (logs/callisto-sync.log)
 #   reset     Same as all except does not start Callisto
-#   up        docker compose up -d (keeps data) → wait → hasura metadata apply
+#   up        docker compose … up -d (keeps data) → wait → hasura metadata apply
 #   stop      Stop Callisto only (Docker keeps running)
 #   build     make build
 #   start     Foreground Callisto (builds if build/callisto missing)
@@ -22,7 +22,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LOG_DIR="${ROOT}/logs"
 LOG_FILE="${LOG_DIR}/callisto-sync.log"
-COMPOSE="docker compose"
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.dev.yml"
 CALLISTO_HOME="${ROOT}/.callisto"
 CALLISTO_BIN="${ROOT}/build/callisto"
 
@@ -78,6 +78,7 @@ check_callisto_config() {
 
 check_compose_project() {
   [[ -f "${ROOT}/docker-compose.yml" ]] || die "Missing ${ROOT}/docker-compose.yml"
+  [[ -f "${ROOT}/docker-compose.dev.yml" ]] || die "Missing ${ROOT}/docker-compose.dev.yml"
 }
 
 check_hasura_project() {

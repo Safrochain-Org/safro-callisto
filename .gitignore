@@ -6,6 +6,8 @@ vendor/
 *.toml
 *.json
 config.yaml
+# Allow repo-default Callisto config (other `config.yaml` paths stay ignored)
+!.callisto/config.yaml
 
 # Coverage
 coverage.*

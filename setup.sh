@@ -108,12 +108,12 @@ start_docker_services() {
 
   log "Starting PostgreSQL and Hasura via docker-compose ..."
   cd "$SCRIPT_DIR"
-  docker compose down -v 2>/dev/null || true
-  docker compose up -d
+  docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v 2>/dev/null || true
+  docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
   log "Waiting for PostgreSQL to be ready ..."
   for i in $(seq 1 30); do
-    if docker compose exec -T postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" &>/dev/null; then
+    if docker compose -f docker-compose.yml -f docker-compose.dev.yml exec -T postgres pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" &>/dev/null; then
       log "PostgreSQL is ready"
       break
     fi
@@ -277,7 +277,7 @@ main() {
   log ""
   log "Management:"
   log "  Stop callisto:    kill \$(cat ${SCRIPT_DIR}/callisto.pid)"
-  log "  Stop infra:       cd ${SCRIPT_DIR} && docker compose down"
+  log "  Stop infra:       cd ${SCRIPT_DIR} && docker compose -f docker-compose.yml -f docker-compose.dev.yml down"
   log "  Restart all:      cd ${SCRIPT_DIR} && bash setup.sh"
   log ""
 }

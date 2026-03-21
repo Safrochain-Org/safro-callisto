@@ -114,6 +114,8 @@ From `/opt/safro-callisto`:
 docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file .env up -d
 ```
 
+The base `docker-compose.yml` does **not** publish host ports; `deploy/docker-compose.production.yml` maps **127.0.0.1:5434** and **127.0.0.1:8080** only (avoiding duplicate port bindings when merging files). For local dev, use `docker-compose.dev.yml` (see `./scripts/dev-stack.sh`).
+
 Verify:
 
 ```bash
