@@ -7,6 +7,9 @@ vendor/
 *.json
 config.yaml
 
+# Callisto home: copy `.callisto/config.yaml.example` → `.callisto/config.yaml` locally
+.callisto/config.yaml
+
 # Coverage
 coverage.*
 

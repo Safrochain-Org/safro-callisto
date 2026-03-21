@@ -15,6 +15,12 @@ created using [Hasura](https://hasura.io/).
 
 ## Local stack (Safro fork)
 
+First-time setup: `.callisto/config.yaml` is not in Git (ignored). Copy the template:
+
+`mkdir -p .callisto && cp .callisto/config.yaml.example .callisto/config.yaml`
+
+Then edit RPC/gRPC, `database.url` (password/port), and `parsing.start_height` if needed (see `docs/INDEXER-SYNC.md`).
+
 From this directory:
 
 | Command | What it does |
