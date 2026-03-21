@@ -6,9 +6,8 @@ vendor/
 *.toml
 *.json
 config.yaml
-
-# Callisto home: copy `.callisto/config.yaml.example` → `.callisto/config.yaml` locally
-.callisto/config.yaml
+# Allow repo-default Callisto config (other `config.yaml` paths stay ignored)
+!.callisto/config.yaml
 
 # Coverage
 coverage.*

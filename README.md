@@ -15,11 +15,7 @@ created using [Hasura](https://hasura.io/).
 
 ## Local stack (Safro fork)
 
-First-time setup: `.callisto/config.yaml` is not in Git (ignored). Copy the template:
-
-`mkdir -p .callisto && cp .callisto/config.yaml.example .callisto/config.yaml`
-
-Then edit RPC/gRPC, `database.url` (password/port), and `parsing.start_height` if needed (see `docs/INDEXER-SYNC.md`).
+The repo includes **`.callisto/config.yaml`** (defaults match `docker-compose` Postgres on `localhost:5434`). Edit RPC/gRPC, `database.url`, and `parsing.start_height` as needed (see `docs/INDEXER-SYNC.md`). You can copy **`.callisto/config.yaml.example`** if you want a backup before editing.
 
 From this directory:
 
