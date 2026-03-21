@@ -9,7 +9,7 @@ From `safro-callisto/`:
 ./scripts/dev-stack.sh logs   # optional: follow Callisto output
 ```
 
-- **`all`** = stop Callisto → `docker compose down -v` → `up -d` → wait for Postgres/Hasura → `hasura metadata apply` → Callisto in **background** (`logs/callisto-sync.log`).
+- **`all`** = stop Callisto → `docker compose … down -v` → `up -d` (uses `docker-compose.yml` + `docker-compose.dev.yml`) → wait for Postgres/Hasura → `hasura metadata apply` → Callisto in **background** (`logs/callisto-sync.log`).
 - **`start_height`** is whatever you set in `.callisto/config.yaml` (default **0** needs **archive** RPC/gRPC if the node is pruned; see below).
 
 Other commands: `./scripts/dev-stack.sh help` · verify prerequisites: `./scripts/dev-stack.sh check`
@@ -37,7 +37,7 @@ Optional: `RPC_URL=... START_HEIGHT_OFFSET=40 UPDATE_START_HEIGHT=1 ./scripts/bu
 Then:
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 # Hasura CLI needs hasura/config.yaml as cwd (or use --project hasura from safro-callisto root):
 ./scripts/hasura-metadata-apply.sh
 # Or: (cd hasura && hasura metadata apply --endpoint http://localhost:8080)
@@ -70,9 +70,9 @@ Easiest: run **`./scripts/hasura-metadata-apply.sh`** from `safro-callisto` (no 
 - **Staking voting power / status**: Avoids zero-value rows when skipping unknown validators; dedupes batch inserts so PostgreSQL `ON CONFLICT` is not hit twice in one statement.
 
 
-./scripts/dev-stack.sh all	Stops Callisto → docker compose down -v (drops DB volume) → up -d → waits for Postgres & Hasura → hasura metadata apply → starts Callisto in the background and appends logs/callisto-sync.log
+./scripts/dev-stack.sh all	Stops Callisto → docker compose … down -v (drops DB volume) → up -d (base + docker-compose.dev.yml) → waits for Postgres & Hasura → hasura metadata apply → starts Callisto in the background and appends logs/callisto-sync.log
 ./scripts/dev-stack.sh reset	Same as above without starting Callisto
-./scripts/dev-stack.sh up	docker compose up -d (keeps data) + Hasura apply
+./scripts/dev-stack.sh up	docker compose … up -d (keeps data) + Hasura apply
 ./scripts/dev-stack.sh stop	Stops Callisto only (Docker keeps running)
 ./scripts/dev-stack.sh build	make build
 ./scripts/dev-stack.sh start	Foreground Callisto (builds if build/callisto is missing)

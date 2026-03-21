@@ -21,9 +21,9 @@ From this directory:
 
 | Command | What it does |
 |--------|----------------|
-| `./scripts/dev-stack.sh all` | Stop Callisto → `docker compose down -v` → `up -d` → wait Postgres & Hasura → Hasura metadata apply → Callisto **in background** (`logs/callisto-sync.log`) |
+| `./scripts/dev-stack.sh all` | Stop Callisto → `docker compose … down -v` → `up -d` (uses `docker-compose.yml` + `docker-compose.dev.yml`) → wait Postgres & Hasura → Hasura metadata apply → Callisto **in background** (`logs/callisto-sync.log`) |
 | `./scripts/dev-stack.sh reset` | Same as `all` but does **not** start Callisto |
-| `./scripts/dev-stack.sh up` | `docker compose up -d` (keeps data) → wait → Hasura metadata apply |
+| `./scripts/dev-stack.sh up` | `docker compose … up -d` (keeps data) → wait → Hasura metadata apply |
 | `./scripts/dev-stack.sh stop` | Stop Callisto only (Docker keeps running) |
 | `./scripts/dev-stack.sh build` | `make build` |
 | `./scripts/dev-stack.sh start` | Callisto in **foreground** (builds if `build/callisto` missing) |

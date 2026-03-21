@@ -1,9 +1,10 @@
+# Host port publishing: use `docker-compose.dev.yml` (see ./scripts/dev-stack.sh) or the
+# production overlay `deploy/docker-compose.production.yml` — not defined here on purpose.
+
 services:
   postgres:
     image: postgres:14-alpine
     container_name: safro-postgres
-    ports:
-      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-callisto}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -21,8 +22,6 @@ services:
   hasura:
     image: hasura/graphql-engine:v2.0.4
     container_name: safro-hasura
-    ports:
-      - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
