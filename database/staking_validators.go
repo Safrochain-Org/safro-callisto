@@ -363,11 +363,46 @@ func (db *Db) getValidatorCommission(address sdk.ConsAddress) (*dbtypes.Validato
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// dedupeValidatorVotingPowers keeps one entry per consensus address (last wins).
+// Duplicate rows in a single INSERT with ON CONFLICT cause PostgreSQL error
+// "ON CONFLICT DO UPDATE command cannot affect row a second time".
+func dedupeValidatorVotingPowers(entries []types.ValidatorVotingPower) []types.ValidatorVotingPower {
+	if len(entries) <= 1 {
+		return entries
+	}
+	byAddr := make(map[string]types.ValidatorVotingPower, len(entries))
+	for _, e := range entries {
+		byAddr[e.ConsensusAddress] = e
+	}
+	out := make([]types.ValidatorVotingPower, 0, len(byAddr))
+	for _, e := range byAddr {
+		out = append(out, e)
+	}
+	return out
+}
+
+// dedupeValidatorStatuses keeps one entry per consensus address (last wins).
+func dedupeValidatorStatuses(statuses []types.ValidatorStatus) []types.ValidatorStatus {
+	if len(statuses) <= 1 {
+		return statuses
+	}
+	byAddr := make(map[string]types.ValidatorStatus, len(statuses))
+	for _, s := range statuses {
+		byAddr[s.ConsensusAddress] = s
+	}
+	out := make([]types.ValidatorStatus, 0, len(byAddr))
+	for _, s := range byAddr {
+		out = append(out, s)
+	}
+	return out
+}
+
 // SaveValidatorsVotingPowers saves the given validator voting powers.
 // It assumes that the delegator address is already present inside the
 // proper database table.
 // TIP: To store the validator data call SaveValidatorData.
 func (db *Db) SaveValidatorsVotingPowers(entries []types.ValidatorVotingPower) error {
+	entries = dedupeValidatorVotingPowers(entries)
 	if len(entries) == 0 {
 		return nil
 	}
@@ -400,6 +435,7 @@ WHERE validator_voting_power.height <= excluded.height`
 
 // SaveValidatorsStatuses save validator jail and status in the given height and timestamp
 func (db *Db) SaveValidatorsStatuses(statuses []types.ValidatorStatus) error {
+	statuses = dedupeValidatorStatuses(statuses)
 	if len(statuses) == 0 {
 		return nil
 	}

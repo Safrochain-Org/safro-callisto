@@ -1,0 +1,30 @@
+# /etc/systemd/system/safro-indexer-docker.service
+# Docker stack: Postgres + Hasura (no `down` on stop — containers stay for clean restarts).
+#
+# sudo install -o root -g root -m 644 safro-indexer-docker.service /etc/systemd/system/
+# sudo systemctl daemon-reload
+# sudo systemctl enable --now safro-indexer-docker.service
+#
+# Adjust paths and User= to match your server (user must be in group "docker").
+
+[Unit]
+Description=Safro indexer Docker stack (Postgres + Hasura)
+Documentation=file:///opt/safro-callisto/docs/DEPLOY-SERVER.md
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/safro-callisto
+EnvironmentFile=-/opt/safro-callisto/.env
+# Production overlay (localhost bind + hardened Hasura)
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file /opt/safro-callisto/.env up -d
+ExecStop=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file /opt/safro-callisto/.env stop
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target

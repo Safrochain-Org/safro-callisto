@@ -13,6 +13,29 @@ All the chains' data that are queried from the RPC and gRPC endpoints are stored
 a [PostgreSQL](https://www.postgresql.org/) database on top of which [GraphQL](https://graphql.org/) APIs can then be
 created using [Hasura](https://hasura.io/).
 
+## Local stack (Safro fork)
+
+From this directory:
+
+| Command | What it does |
+|--------|----------------|
+| `./scripts/dev-stack.sh all` | Stop Callisto → `docker compose down -v` → `up -d` → wait Postgres & Hasura → Hasura metadata apply → Callisto **in background** (`logs/callisto-sync.log`) |
+| `./scripts/dev-stack.sh reset` | Same as `all` but does **not** start Callisto |
+| `./scripts/dev-stack.sh up` | `docker compose up -d` (keeps data) → wait → Hasura metadata apply |
+| `./scripts/dev-stack.sh stop` | Stop Callisto only (Docker keeps running) |
+| `./scripts/dev-stack.sh build` | `make build` |
+| `./scripts/dev-stack.sh start` | Callisto in **foreground** (builds if `build/callisto` missing) |
+| `./scripts/dev-stack.sh start-bg` | Callisto in **background** + log file |
+| `./scripts/dev-stack.sh logs` | `tail -f logs/callisto-sync.log` |
+| `./scripts/dev-stack.sh check` | Verify Docker daemon, `docker compose`, `curl`, `hasura` CLI, compose/hasura paths, `.callisto/config.yaml`, and Go/`make` or existing binary |
+| `./scripts/dev-stack.sh help` | Short usage |
+
+Requires: **Docker** (daemon running), **`docker compose` v2**, **`curl`**, **[Hasura CLI](https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/)**, **Go** + **make** (to build Callisto, or a prebuilt `build/callisto`). Set `SKIP_DEV_STACK_CHECKS=1` only if you must bypass checks.
+
+See `docs/INDEXER-SYNC.md` for RPC pruning / `start_height` and archive nodes.
+
+**Production server** (Docker + systemd + Nginx, GraphQL hostname): `docs/DEPLOY-SERVER.md`.
+
 ## Usage
 To know how to setup and run Callisto, please refer to
 the [docs website](https://docs.bigdipper.live/cosmos-based/parser/overview/).
