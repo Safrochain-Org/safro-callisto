@@ -17,7 +17,7 @@ services:
       - "127.0.0.1:8080:8080"
     environment:
       HASURA_GRAPHQL_DEV_MODE: "false"
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       # Callisto actions on the host (Linux Docker: host-gateway)
       ACTION_BASE_URL: http://host.docker.internal:3001
