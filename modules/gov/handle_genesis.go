@@ -13,26 +13,92 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// govParamsKeysAllowedInSDK047 are JSON keys for x/gov v1.Params in cosmos-sdk v0.47.x.
+// Newer chains add fields (e.g. min_deposit_ratio); the amino/codec rejects unknown keys.
+var govParamsKeysAllowedInSDK047 = map[string]struct{}{
+	"min_deposit":                   {},
+	"max_deposit_period":            {},
+	"voting_period":                 {},
+	"quorum":                        {},
+	"threshold":                     {},
+	"veto_threshold":                {},
+	"min_initial_deposit_ratio":     {},
+	"burn_vote_quorum":              {},
+	"burn_proposal_deposit_prevote": {},
+	"burn_vote_veto":                {},
+}
+
+// govGenesisRootKeysAllowed are top-level JSON keys for x/gov v1.GenesisState in SDK 0.47.x.
+// Chains may add fields (e.g. constitution); the codec rejects them.
+var govGenesisRootKeysAllowed = map[string]struct{}{
+	"starting_proposal_id": {},
+	"deposits":             {},
+	"votes":                {},
+	"proposals":            {},
+	"deposit_params":       {},
+	"voting_params":        {},
+	"tally_params":         {},
+	"params":               {},
+}
+
+func filterGovParamsJSON(paramsRaw json.RawMessage) (json.RawMessage, error) {
+	var params map[string]interface{}
+	if err := json.Unmarshal(paramsRaw, &params); err != nil {
+		return paramsRaw, nil
+	}
+	filtered := make(map[string]interface{}, len(params))
+	for k, v := range params {
+		if _, ok := govParamsKeysAllowedInSDK047[k]; ok {
+			filtered[k] = v
+		}
+	}
+	return json.Marshal(filtered)
+}
+
+// sanitizeGovGenesisJSON drops gov genesis keys unknown to the linked SDK (root + params).
+func sanitizeGovGenesisJSON(raw json.RawMessage) (json.RawMessage, error) {
+	var doc map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		return nil, err
+	}
+	out := make(map[string]json.RawMessage)
+	for k, v := range doc {
+		if _, ok := govGenesisRootKeysAllowed[k]; !ok {
+			continue
+		}
+		if k == "params" {
+			pv, err := filterGovParamsJSON(v)
+			if err != nil {
+				return nil, err
+			}
+			v = pv
+		}
+		out[k] = v
+	}
+	return json.Marshal(out)
+}
+
 // HandleGenesis implements modules.Module
 func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
 	log.Debug().Str("module", "gov").Msg("parsing genesis")
 
-	// Read the genesis state
-	var genStatev1beta1 govtypesv1.GenesisState
-	err := m.cdc.UnmarshalJSON(appState[gov.ModuleName], &genStatev1beta1)
+	sanitized, err := sanitizeGovGenesisJSON(appState[gov.ModuleName])
 	if err != nil {
+		return fmt.Errorf("error while sanitizing gov genesis data: %s", err)
+	}
+
+	var genStatev1beta1 govtypesv1.GenesisState
+	if err := m.cdc.UnmarshalJSON(sanitized, &genStatev1beta1); err != nil {
 		return fmt.Errorf("error while reading gov genesis data: %s", err)
 	}
 
 	// Save the proposals
-	err = m.saveGenesisProposals(genStatev1beta1.Proposals, doc)
-	if err != nil {
+	if err := m.saveGenesisProposals(genStatev1beta1.Proposals, doc); err != nil {
 		return fmt.Errorf("error while storing genesis governance proposals: %s", err)
 	}
 
 	// Save the params
-	err = m.db.SaveGovParams(types.NewGovParams(genStatev1beta1.Params, doc.InitialHeight))
-	if err != nil {
+	if err := m.db.SaveGovParams(types.NewGovParams(genStatev1beta1.Params, doc.InitialHeight)); err != nil {
 		return fmt.Errorf("error while storing genesis governance params: %s", err)
 	}
 

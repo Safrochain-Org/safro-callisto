@@ -1,26 +1,40 @@
-version: '3.6'
 services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: safro-postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-callisto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-callisto}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-callisto} -d ${POSTGRES_DB:-callisto}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
   hasura:
     image: hasura/graphql-engine:v2.0.4
+    container_name: safro-hasura
     ports:
-    - "8080:8080"
-    restart: always
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
-      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      ## enable the console served by server
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
-      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER:-callisto}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-callisto}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      ## uncomment next line to set an admin secret
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-  callisto:
-    build:
-      context: .
-      dockerfile: Dockerfile
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      ACTION_BASE_URL: http://host.docker.internal:3001
     restart: always
-    command: callisto parse --home /callisto/.callisto
-    volumes:
-      ## Modify first path to match configuration file.
-      - /callisto/.callisto:/callisto/.callisto
+
+volumes:
+  postgres_data:

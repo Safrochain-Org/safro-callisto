@@ -1,6 +1,7 @@
 package main
 
 import (
+	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/forbole/juno/v5/cmd"
 	initcmd "github.com/forbole/juno/v5/cmd/init"
@@ -56,6 +57,7 @@ func main() {
 func getBasicManagers() []module.BasicManager {
 	return []module.BasicManager{
 		simapp.ModuleBasics,
+		module.NewBasicManager(wasm.AppModuleBasic{}),
 	}
 }
 

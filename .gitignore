@@ -9,3 +9,7 @@ config.yaml
 
 # Coverage
 coverage.*
+
+# Local indexer logs (dev-stack.sh start-bg)
+logs/
+callisto-sync.log
