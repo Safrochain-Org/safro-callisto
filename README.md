@@ -31,3 +31,15 @@ This will:
 2. Run all the tests using that database as support.
 
 
+pkill -f 'callisto start'
+docker compose down
+./scripts/reset-db.sh
+./build/callisto parse genesis-file --home .callisto --genesis-file-path .callisto/genesis.json
+docker compose --env-file .env up -d
+sleep 5
+cd hasura && hasura metadata apply --endpoint http://127.0.0.1:8080 --admin-secret myadminsecretkey && cd ..
+mkdir -p logs
+nohup ./build/callisto start --home .callisto >> logs/callisto-sync.log 2>&1 &
+tail -f logs/callisto-sync.log
+
+
