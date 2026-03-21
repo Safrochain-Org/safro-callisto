@@ -6,11 +6,16 @@ vendor/
 *.toml
 *.json
 config.yaml
+!.callisto/config.yaml
 !.callisto/config.yaml.example
 .env
 
 # Logs
 logs/
+callisto-sync.log
+callisto.log
+callisto.pid
+*.pid
 
 # Coverage
 coverage.*

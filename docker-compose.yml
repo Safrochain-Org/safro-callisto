@@ -1,3 +1,6 @@
+# Hasura only — Postgres runs on the host (see scripts/setup-db.sh).
+# GraphQL: http://127.0.0.1:8080
+
 services:
   hasura:
     image: hasura/graphql-engine:v2.0.4
