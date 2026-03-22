@@ -30,5 +30,10 @@ func (m *Module) GetLatestCommunityPool() error {
 		return fmt.Errorf("error while getting latest block height: %s", err)
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "distribution").Msg("skipping community pool update: no blocks indexed yet")
+		return nil
+	}
+
 	return m.updateCommunityPool(block.Height)
 }

@@ -95,3 +95,9 @@ type BlockHeightAndTimestamp struct {
 	Height         int64     `db:"height"`
 	BlockTimestamp time.Time `db:"timestamp"`
 }
+
+// IsEmpty is true when the block table has no rows (GetLastBlockHeightAndTimestamp returns zero values).
+// Indexed chains use height >= 1; height 0 must not be used for FKs into block(height).
+func (b BlockHeightAndTimestamp) IsEmpty() bool {
+	return b.Height == 0
+}

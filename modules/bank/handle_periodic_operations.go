@@ -32,6 +32,11 @@ func (m *Module) UpdateSupply() error {
 		return fmt.Errorf("error while getting latest block height: %s", err)
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "bank").Msg("skipping supply update: no blocks indexed yet")
+		return nil
+	}
+
 	supply, err := m.keeper.GetSupply(block.Height)
 	if err != nil {
 		return err

@@ -71,6 +71,9 @@ func (m *Module) handleSubmitProposalEvent(tx *juno.Tx, proposer string, events 
 			if err != nil {
 				return fmt.Errorf("error while getting latest block height: %s", err)
 			}
+			if block.IsEmpty() {
+				return fmt.Errorf("error while getting proposal: no blocks indexed yet")
+			}
 			proposal, err = m.source.Proposal(block.Height, proposalID)
 			if err != nil {
 				return fmt.Errorf("error while getting proposal: %s", err)

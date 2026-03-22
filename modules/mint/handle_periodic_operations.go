@@ -34,6 +34,11 @@ func (m *Module) UpdateInflation() error {
 		return err
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "mint").Msg("skipping inflation update: no blocks indexed yet")
+		return nil
+	}
+
 	// Get the inflation
 	inflation, err := m.source.GetInflation(block.Height)
 	if err != nil {

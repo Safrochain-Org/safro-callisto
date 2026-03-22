@@ -210,6 +210,11 @@ func (m *Module) UpdateValidatorStatuses() error {
 		return fmt.Errorf("error while getting latest block height from db: %s", err)
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "staking").Msg("skipping validator status update: no blocks indexed yet")
+		return nil
+	}
+
 	validators, _, err := m.GetValidatorsWithStatus(block.Height, stakingtypes.Bonded.String())
 	if err != nil {
 		return fmt.Errorf("error while getting validators with bonded status: %s", err)

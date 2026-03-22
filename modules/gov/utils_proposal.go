@@ -72,6 +72,11 @@ func (m *Module) UpdateProposalsStakingPoolSnapshot() error {
 		return err
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "gov").Msg("skipping proposal staking pool snapshots: no blocks indexed yet")
+		return nil
+	}
+
 	ids, err := m.db.GetOpenProposalsIds(block.BlockTimestamp)
 	if err != nil {
 		log.Error().Err(err).Str("module", "gov").Msg("error while getting open proposals ids")
@@ -163,6 +168,11 @@ func (m *Module) UpdateProposalsTallyResults() error {
 	block, err := m.db.GetLastBlockHeightAndTimestamp()
 	if err != nil {
 		return err
+	}
+
+	if block.IsEmpty() {
+		log.Debug().Str("module", "gov").Msg("skipping proposal tally updates: no blocks indexed yet")
+		return nil
 	}
 
 	ids, err := m.db.GetOpenProposalsIds(block.BlockTimestamp)
