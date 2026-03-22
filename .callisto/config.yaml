@@ -27,7 +27,7 @@ node:
       max_connections: 20
     grpc:
       # Must match your operator’s gRPC host (REST: https://sf-rest.testnet.safrochain.com).
-      address: sf-grpc.testnet.safrochain.com:9090
+      address: sf-grpc-testnet.safrochain.com:9090
       insecure: true
 
 # start_height: 0 = from genesis. Pruned public nodes need archive RPC/gRPC or a higher start_height.
