@@ -42,9 +42,9 @@ parsing:
   average_block_time: 3s
 
 database:
-  # Password must match the role created by scripts/setup-db.sh (POSTGRES_PASSWORD / default "password").
-  # Port 5432 = host Postgres; 5434 = typical Docker-published Postgres (pick one and match everywhere).
-  url: postgres://callisto:password@localhost:5432/callisto?sslmode=disable&search_path=public
+  # Password must match POSTGRES_PASSWORD used with scripts/reset-db.sh AND .env (Hasura).
+  # Use 127.0.0.1 if localhost resolves differently for libpq on your host.
+  url: postgres://callisto:password@127.0.0.1:5432/callisto?sslmode=disable&search_path=public
   max_open_connections: 10
   max_idle_connections: 10
   partition_size: 100000
