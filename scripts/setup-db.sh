@@ -1,16 +1,27 @@
 #!/usr/bin/env bash
+# Create Postgres role + database for Callisto (run once, or after reset-db).
+# Sources repo `.env` when present. Defaults match Docker production: 127.0.0.1:5434.
 set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ -f "${ROOT}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT}/.env"
+  set +a
+fi
 
 DB_USER="${POSTGRES_USER:-callisto}"
 DB_PASS="${POSTGRES_PASSWORD:-password}"
 DB_NAME="${POSTGRES_DB:-callisto}"
-DB_HOST="${POSTGRES_HOST:-localhost}"
-DB_PORT="${POSTGRES_PORT:-5432}"
-PG_SUPER="${PG_SUPERUSER:-$(whoami)}"
+DB_HOST="${POSTGRES_HOST:-127.0.0.1}"
+DB_PORT="${POSTGRES_PORT:-5434}"
+# Docker postgres image: POSTGRES_USER is superuser. Override for local socket installs.
+PG_SUPER="${PG_SUPERUSER:-${POSTGRES_USER:-callisto}}"
+export PGPASSWORD="${POSTGRES_SUPER_PASSWORD:-$POSTGRES_PASSWORD}"
 
 # Superuser connection:
 # - On Debian/Ubuntu, "postgres" over TCP often has no password; use peer auth via sudo + unix socket.
-# - Otherwise use TCP: psql -h ... -U "$PG_SUPER"
+# - Docker / remote TCP: use POSTGRES_USER + POSTGRES_PASSWORD (see PG_SUPERUSER).
 psql_super() {
   if [ "$PG_SUPER" = "postgres" ] && command -v sudo >/dev/null; then
     sudo -u postgres psql -d postgres "$@"

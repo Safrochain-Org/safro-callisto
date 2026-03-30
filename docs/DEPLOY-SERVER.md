@@ -130,6 +130,8 @@ curl -sS http://127.0.0.1:8080/healthz
 ./scripts/migrate-db.sh
 ```
 
+Run **`migrate-db.sh` only once** on an empty database. If you need a clean slate (drops all indexed data), use **`./scripts/reset-db.sh`** — it sources **`.env`**, connects to **`127.0.0.1:5434`** by default, and uses **`POSTGRES_USER`** as the PostgreSQL superuser (Docker image). For a host install with `sudo -u postgres`, set **`PG_SUPERUSER=postgres`** in `.env`.
+
 **First-time (or after metadata changes):** apply Hasura metadata (needs [Hasura CLI](https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/)):
 
 ```bash
