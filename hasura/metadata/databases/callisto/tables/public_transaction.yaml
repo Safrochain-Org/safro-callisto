@@ -23,4 +23,4 @@ select_permissions:
     - logs
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

@@ -10,4 +10,4 @@ select_permissions:
     - time
     filter: {}
     limit: 1
-  role: anonymous
+  role: viewer

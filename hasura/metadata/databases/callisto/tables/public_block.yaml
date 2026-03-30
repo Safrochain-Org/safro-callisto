@@ -61,4 +61,4 @@ select_permissions:
     - timestamp
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

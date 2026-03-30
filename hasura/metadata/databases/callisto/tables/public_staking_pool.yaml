@@ -12,4 +12,4 @@ select_permissions:
     - staked_not_bonded_tokens
     filter: {}
     limit: 1
-  role: anonymous
+  role: viewer

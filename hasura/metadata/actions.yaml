@@ -17,7 +17,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 ##### Staking / Delegatagor #####
 - name: action_delegation_reward
@@ -35,7 +35,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_delegator_withdraw_address
   definition:
@@ -50,7 +50,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_delegation
   definition:
@@ -73,7 +73,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_delegation_total
   definition:
@@ -90,7 +90,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_redelegation
   definition:
@@ -113,7 +113,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_unbonding_delegation
   definition:
@@ -136,7 +136,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_unbonding_delegation_total
   definition:
@@ -153,7 +153,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 ##### Staking / Validator #####
 - name: action_validator_commission_amount
@@ -169,7 +169,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_validator_delegations
   definition:
@@ -190,7 +190,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous  
+  - role: viewer  
 
 - name: action_validator_redelegations_from
   definition:
@@ -213,7 +213,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 - name: action_validator_unbonding_delegations
   definition:
@@ -234,7 +234,7 @@ actions:
     - value: application/json
       name: Content-Type
   permissions:
-  - role: anonymous
+  - role: viewer
 
 ############### CUSTOM TYPES ###############
 custom_types:

@@ -28,4 +28,4 @@ select_permissions:
     - height
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

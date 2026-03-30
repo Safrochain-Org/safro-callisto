@@ -15,4 +15,4 @@ select_permissions:
     - unit_name
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

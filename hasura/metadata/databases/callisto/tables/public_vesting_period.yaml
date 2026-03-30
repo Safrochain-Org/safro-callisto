@@ -14,4 +14,4 @@ select_permissions:
     - amount
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

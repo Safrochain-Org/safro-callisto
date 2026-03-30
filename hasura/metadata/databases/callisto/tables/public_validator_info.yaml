@@ -19,4 +19,4 @@ select_permissions:
     - max_rate
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

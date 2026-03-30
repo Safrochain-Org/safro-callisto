@@ -33,4 +33,4 @@ select_permissions:
     - signature
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

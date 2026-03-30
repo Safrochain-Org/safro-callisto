@@ -1,0 +1,362 @@
+# Explorer-facing operations for safro-callisto / Hasura.
+# Copy into your app’s `src/graphql/` or point graphql-codegen here.
+# ---------------------------------------------------------------------------
+# Fragments
+# ---------------------------------------------------------------------------
+
+fragment TransactionSummary on transaction {
+  hash
+  height
+  success
+  memo
+  fee
+  gas_used
+  gas_wanted
+  block {
+    height
+    timestamp
+  }
+}
+
+fragment BlockSummary on block {
+  height
+  hash
+  timestamp
+  num_txs
+  total_gas
+  proposer_address
+  validator {
+    consensus_address
+    validator_descriptions(limit: 1, order_by: { height: desc }) {
+      moniker
+      avatar_url
+    }
+  }
+}
+
+fragment ValidatorSummary on validator {
+  consensus_address
+  consensus_pubkey
+  validator_info {
+    operator_address
+    self_delegate_address
+  }
+  validator_descriptions(limit: 1, order_by: { height: desc }) {
+    moniker
+    identity
+    website
+    avatar_url
+    height
+  }
+}
+
+fragment ProposalSummary on proposal {
+  id
+  title
+  status
+  submit_time
+  deposit_end_time
+  voting_start_time
+  voting_end_time
+  proposer_address
+  metadata
+  proposal_tally_result {
+    yes
+    no
+    abstain
+    no_with_veto
+    height
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Transactions (slim lists + batched by hash + height counts)
+# ---------------------------------------------------------------------------
+
+query GetTransactionsSummary(
+  $limit: Int!
+  $offset: Int!
+  $order_by: [transaction_order_by!]
+) {
+  transaction(limit: $limit, offset: $offset, order_by: $order_by) {
+    ...TransactionSummary
+  }
+}
+
+query GetLatestTransactionsSummary($limit: Int! = 20) {
+  transaction(limit: $limit, offset: 0, order_by: { height: desc }) {
+    ...TransactionSummary
+  }
+}
+
+query GetTransactionsByHashes($hashes: [String!]!) {
+  transaction(where: { hash: { _in: $hashes } }) {
+    ...TransactionSummary
+  }
+}
+
+query GetTransactionCountBetweenByHeight($minHeight: bigint!, $maxHeight: bigint!) {
+  transaction_aggregate(
+    where: { height: { _gte: $minHeight, _lte: $maxHeight } }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
+
+query GetTransactionCountBetweenByHeightDual($minHeight: bigint!, $maxHeight: bigint!) {
+  total: transaction_aggregate(
+    where: { height: { _gte: $minHeight, _lte: $maxHeight } }
+  ) {
+    aggregate {
+      count
+    }
+  }
+  failed: transaction_aggregate(
+    where: {
+      height: { _gte: $minHeight, _lte: $maxHeight }
+      success: { _eq: false }
+    }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Blocks (list without aggregate)
+# ---------------------------------------------------------------------------
+
+query GetBlocksList(
+  $limit: Int!
+  $offset: Int!
+  $order_by: [block_order_by!]
+) {
+  block(limit: $limit, offset: $offset, order_by: $order_by) {
+    ...BlockSummary
+  }
+}
+
+query GetLatestBlocksList($limit: Int! = 20) {
+  block(limit: $limit, offset: 0, order_by: { height: desc }) {
+    ...BlockSummary
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Charts (named documents; optional height bound helper)
+# ---------------------------------------------------------------------------
+
+query ChartTxBucketDualSingle($from: timestamp!, $to: timestamp!) {
+  t: transaction_aggregate(
+    where: { block: { timestamp: { _gte: $from, _lt: $to } } }
+  ) {
+    aggregate {
+      count
+    }
+  }
+  f: transaction_aggregate(
+    where: {
+      _and: [
+        { block: { timestamp: { _gte: $from, _lt: $to } } }
+        { success: { _eq: false } }
+      ]
+    }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
+
+query ChartBucketHeightBounds($from: timestamp!, $to: timestamp!) {
+  low: block(
+    where: { timestamp: { _gte: $from } }
+    order_by: { height: asc }
+    limit: 1
+  ) {
+    height
+    timestamp
+  }
+  high: block(
+    where: { timestamp: { _lte: $to } }
+    order_by: { height: desc }
+    limit: 1
+  ) {
+    height
+    timestamp
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Validators
+# ---------------------------------------------------------------------------
+
+query GetValidatorsListSummary(
+  $limit: Int!
+  $offset: Int!
+  $order_by: [validator_order_by!]
+) {
+  validator(limit: $limit, offset: $offset, order_by: $order_by) {
+    ...ValidatorSummary
+  }
+}
+
+query GetValidatorByConsensusAddress($consensusAddress: String!) {
+  validator(where: { consensus_address: { _eq: $consensusAddress } }, limit: 1) {
+    ...ValidatorSummary
+    validator_statuses(limit: 1, order_by: { height: desc }) {
+      status
+      jailed
+      height
+    }
+    validator_commissions(limit: 1, order_by: { height: desc }) {
+      commission
+      height
+    }
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Governance
+# ---------------------------------------------------------------------------
+
+query GetProposalsList(
+  $limit: Int!
+  $offset: Int!
+  $order_by: [proposal_order_by!]
+) {
+  proposal(limit: $limit, offset: $offset, order_by: $order_by) {
+    ...ProposalSummary
+  }
+}
+
+query GetProposalDetail($id: Int!) {
+  proposal(where: { id: { _eq: $id } }, limit: 1) {
+    ...ProposalSummary
+    description
+    content
+    proposer {
+      address
+    }
+    proposal_deposits(order_by: { height: asc }) {
+      proposal_id
+      depositor_address
+      amount
+      timestamp
+      height
+    }
+    proposal_votes(limit: 100, order_by: { height: desc }) {
+      proposal_id
+      voter_address
+      option
+      weight
+      timestamp
+      height
+    }
+  }
+}
+
+query GetProposalVotesForProposal(
+  $proposalId: Int!
+  $limit: Int!
+  $offset: Int!
+) {
+  proposal_vote(
+    where: { proposal_id: { _eq: $proposalId } }
+    limit: $limit
+    offset: $offset
+    order_by: { height: desc }
+  ) {
+    proposal_id
+    voter_address
+    option
+    weight
+    timestamp
+    height
+    account {
+      address
+    }
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Messages (CosmWasm-style filtering via `type`, no dedicated contract tables)
+# ---------------------------------------------------------------------------
+
+query GetMessagesByType(
+  $type: String!
+  $limit: Int!
+  $offset: Int!
+) {
+  message(
+    where: { type: { _eq: $type } }
+    limit: $limit
+    offset: $offset
+    order_by: { height: desc }
+  ) {
+    transaction_hash
+    index
+    type
+    height
+    involved_accounts_addresses
+    transaction {
+      hash
+      height
+      success
+      block {
+        timestamp
+      }
+    }
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Search (run one query or parallel requests from the client)
+# ---------------------------------------------------------------------------
+
+query SearchTransactionByHash($hash: String!) {
+  transaction(where: { hash: { _eq: $hash } }, limit: 1) {
+    ...TransactionSummary
+  }
+}
+
+query SearchBlockByHeight($height: bigint!) {
+  block(where: { height: { _eq: $height } }, limit: 1) {
+    ...BlockSummary
+  }
+}
+
+query SearchBlockByHashPrefix($hash: String!) {
+  block(where: { hash: { _ilike: $hash } }, limit: 5) {
+    ...BlockSummary
+  }
+}
+
+query SearchAccountByAddress($address: String!) {
+  account(where: { address: { _eq: $address } }, limit: 1) {
+    address
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Subscriptions (match TransactionSummary for list consistency)
+# ---------------------------------------------------------------------------
+
+subscription OnLatestTransactionsSummary($limit: Int! = 20) {
+  transaction(limit: $limit, order_by: { height: desc }) {
+    ...TransactionSummary
+  }
+}
+
+subscription OnNewTransaction {
+  transaction(limit: 1, order_by: { height: desc }) {
+    hash
+    height
+    block {
+      timestamp
+    }
+  }
+}

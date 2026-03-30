@@ -24,4 +24,4 @@ select_permissions:
     - start_time
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

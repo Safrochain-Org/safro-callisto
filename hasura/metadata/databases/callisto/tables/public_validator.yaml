@@ -101,4 +101,4 @@ select_permissions:
     - consensus_pubkey
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

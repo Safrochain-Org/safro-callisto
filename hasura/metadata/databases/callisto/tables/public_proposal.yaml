@@ -69,4 +69,4 @@ select_permissions:
     - content
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer

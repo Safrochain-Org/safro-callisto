@@ -16,4 +16,4 @@ select_permissions:
     - proposer_priority
     filter: {}
     limit: 100
-  role: anonymous
+  role: viewer
