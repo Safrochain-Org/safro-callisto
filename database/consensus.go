@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -8,6 +9,9 @@ import (
 
 	dbtypes "github.com/forbole/callisto/v4/database/types"
 )
+
+// ErrNoBlocksSaved is returned when the block table is empty (before the first block is indexed).
+var ErrNoBlocksSaved = errors.New("cannot get block, no blocks saved")
 
 // GetLastBlock returns the last block stored inside the database based on the heights
 func (db *Db) GetLastBlock() (*dbtypes.BlockRow, error) {
@@ -19,7 +23,7 @@ func (db *Db) GetLastBlock() (*dbtypes.BlockRow, error) {
 	}
 
 	if len(blocks) == 0 {
-		return nil, fmt.Errorf("cannot get block, no blocks saved")
+		return nil, ErrNoBlocksSaved
 	}
 
 	return &blocks[0], nil

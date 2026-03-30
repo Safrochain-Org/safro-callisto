@@ -1,11 +1,13 @@
 package consensus
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
+	"github.com/forbole/callisto/v4/database"
 	"github.com/forbole/callisto/v4/modules/utils"
 )
 
@@ -41,6 +43,9 @@ func (m *Module) updateBlockTimeInMinute() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
@@ -75,6 +80,9 @@ func (m *Module) updateBlockTimeInHour() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
@@ -109,6 +117,9 @@ func (m *Module) updateBlockTimeInDay() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
