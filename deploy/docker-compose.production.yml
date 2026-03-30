@@ -1,0 +1,25 @@
+# Production overlay: bind DB + Hasura to localhost only; tighten Hasura flags.
+# Base `docker-compose.yml` does not publish ports, so this file is the only port mapping
+# (avoids Compose merging duplicate host ports with a dev-oriented base).
+#
+# Usage (from safro-callisto/):
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file .env up -d
+#
+# Required in .env: HASURA_GRAPHQL_ADMIN_SECRET (strong random), POSTGRES_PASSWORD, etc.
+
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5434:5432"
+
+  hasura:
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      HASURA_GRAPHQL_DEV_MODE: "false"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET:-changeme}
+      # Callisto actions on the host (Linux Docker: host-gateway)
+      ACTION_BASE_URL: http://host.docker.internal:3001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

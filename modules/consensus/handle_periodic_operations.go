@@ -1,11 +1,14 @@
 package consensus
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
+	"github.com/forbole/callisto/v4/database"
 	"github.com/forbole/callisto/v4/modules/utils"
 )
 
@@ -41,11 +44,17 @@ func (m *Module) updateBlockTimeInMinute() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 
@@ -75,11 +84,17 @@ func (m *Module) updateBlockTimeInHour() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 
@@ -109,11 +124,17 @@ func (m *Module) updateBlockTimeInDay() error {
 
 	block, err := m.db.GetLastBlock()
 	if err != nil {
+		if errors.Is(err, database.ErrNoBlocksSaved) {
+			return nil
+		}
 		return fmt.Errorf("error while getting last block: %s", err)
 	}
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 

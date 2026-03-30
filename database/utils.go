@@ -14,7 +14,7 @@ func (db *Db) InsertEnableModules(modules []string) error {
 	stmt := "DELETE FROM modules WHERE TRUE"
 	_, err := db.SQL.Exec(stmt)
 	if err != nil {
-		return fmt.Errorf("error while deleting modules: %s", err)
+		return fmt.Errorf("error while deleting modules: %s (run ./scripts/migrate-db.sh if the database schema is empty)", err)
 	}
 
 	if len(modules) == 0 {

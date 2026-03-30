@@ -210,6 +210,11 @@ func (m *Module) UpdateValidatorStatuses() error {
 		return fmt.Errorf("error while getting latest block height from db: %s", err)
 	}
 
+	if block.IsEmpty() {
+		log.Debug().Str("module", "staking").Msg("skipping validator status update: no blocks indexed yet")
+		return nil
+	}
+
 	validators, _, err := m.GetValidatorsWithStatus(block.Height, stakingtypes.Bonded.String())
 	if err != nil {
 		return fmt.Errorf("error while getting validators with bonded status: %s", err)
@@ -270,10 +275,10 @@ func (m *Module) updateProposalValidatorStatusSnapshot(
 // updateValidatorStatusAndVP updates validators status
 // and validators voting power
 func (m *Module) updateValidatorStatusAndVP(height int64, validators []stakingtypes.Validator) error {
-	votingPowers := make([]types.ValidatorVotingPower, len(validators))
-	statuses := make([]types.ValidatorStatus, len(validators))
+	var votingPowers []types.ValidatorVotingPower
+	var statuses []types.ValidatorStatus
 
-	for index, validator := range validators {
+	for _, validator := range validators {
 		consAddr, err := validator.GetConsAddr()
 		if err != nil {
 			return err
@@ -288,15 +293,15 @@ func (m *Module) updateValidatorStatusAndVP(height int64, validators []stakingty
 			return err
 		}
 
-		votingPowers[index] = types.NewValidatorVotingPower(consAddr.String(), validator.Tokens.Int64(), height)
+		votingPowers = append(votingPowers, types.NewValidatorVotingPower(consAddr.String(), validator.Tokens.Int64(), height))
 
-		statuses[index] = types.NewValidatorStatus(
+		statuses = append(statuses, types.NewValidatorStatus(
 			consAddr.String(),
 			consPubKey.String(),
 			int(validator.GetStatus()),
 			validator.IsJailed(),
 			height,
-		)
+		))
 	}
 
 	log.Debug().Str("module", "staking").Msg("refreshing validator voting power")

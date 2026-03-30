@@ -6,6 +6,19 @@ vendor/
 *.toml
 *.json
 config.yaml
+.env
+
+# .callisto/ — only config templates are tracked; genesis.json and other local files stay untracked
+.callisto/*
+!.callisto/config.yaml
+!.callisto/config.yaml.example
+
+# Logs
+logs/
+callisto-sync.log
+callisto.log
+callisto.pid
+*.pid
 
 # Coverage
 coverage.*

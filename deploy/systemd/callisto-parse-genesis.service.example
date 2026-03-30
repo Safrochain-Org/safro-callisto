@@ -1,0 +1,29 @@
+# One-shot: import genesis into Postgres (runs once, then exits).
+# Do NOT enable on boot unless you know what you are doing — re-running on an already-filled DB can fail.
+#
+# Install:
+#   sudo cp deploy/systemd/callisto-parse-genesis.service.example /etc/systemd/system/callisto-parse-genesis.service
+#   # Edit paths/User= to match this server, then:
+#   sudo systemctl daemon-reload
+#
+# Run manually (typical):
+#   sudo systemctl start callisto-parse-genesis.service
+#   sudo systemctl status callisto-parse-genesis.service
+#   journalctl -u callisto-parse-genesis.service -e
+#
+# The long-running indexer is callisto.service (callisto start), not this unit.
+
+[Unit]
+Description=Callisto: parse genesis file into database (oneshot)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=safrorelay
+Group=safrorelay
+WorkingDirectory=/home/safrorelay/projects/safro-callisto
+ExecStart=/home/safrorelay/projects/safro-callisto/build/callisto parse genesis-file --home /home/safrorelay/projects/safro-callisto/.callisto --genesis-file-path /home/safrorelay/projects/safro-callisto/.callisto/genesis.json
+
+# No [Install] section — start manually: sudo systemctl start callisto-parse-genesis.service

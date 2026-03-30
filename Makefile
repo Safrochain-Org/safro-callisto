@@ -1,5 +1,6 @@
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
-COMMIT  := $(shell git log -1 --format='%H')
+# Works without any git tags (falls back to short hash); safe outside a git repo.
+VERSION := $(shell (git describe --tags --always --dirty 2>/dev/null || echo "0.0.0-dev") | sed 's/^v//')
+COMMIT  := $(shell git log -1 --format='%H' 2>/dev/null || echo "unknown")
 
 export GO111MODULE = on
 

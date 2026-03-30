@@ -1,0 +1,73 @@
+chain:
+  bech32_prefix: addr_safro
+  modules:
+    - modules
+    - message_type
+    - messages
+    - auth
+    - bank
+    - consensus
+    - mint
+    - distribution
+    - staking
+    - slashing
+    - pricefeed
+    - gov
+    - feegrant
+    - upgrade
+    - telemetry
+    - actions
+
+node:
+  type: remote
+  config:
+    rpc:
+      client_name: callisto
+      # Juno/Callisto RPC client requires an explicit port (e.g. :443 for HTTPS).
+      address: https://sf-rpc-testnet.safrochain.com:443
+      max_connections: 20
+    grpc:
+      # Must match your operator’s gRPC host (REST: https://sf-rest.testnet.safrochain.com).
+      address: sf-grpc-testnet.safrochain.com:9090
+      insecure: true
+
+# start_height: 0 = from genesis. Pruned public nodes need archive RPC/gRPC or a higher start_height.
+# Optional: UPDATE_START_HEIGHT=1 ./scripts/bump-start-height.sh writes latest-offset for pruned RPC.
+parsing:
+  workers: 4
+  listen_new_blocks: true
+  parse_old_blocks: true
+  parse_genesis: true
+  start_height: 9979256
+  fast_sync: false
+  average_block_time: 3s
+
+database:
+  # Password must match POSTGRES_PASSWORD used with scripts/reset-db.sh AND .env (Hasura).
+  # Use 127.0.0.1 if localhost resolves differently for libpq on your host.
+  url: postgres://callisto:password@127.0.0.1:5434/callisto?sslmode=disable&search_path=public
+  max_open_connections: 10
+  max_idle_connections: 10
+  partition_size: 100000
+  partition_batch: 1000
+
+logging:
+  # Set to `debug` for per-block logs during catch-up (very noisy). Prefer `info` + telemetry/DB for progress.
+  level: info
+  format: text
+
+telemetry:
+  port: 9090
+
+actions:
+  host: 127.0.0.1
+  port: 3001
+
+pricefeed:
+  tokens:
+    - name: safrochain
+      units:
+        - denom: usaf
+          exponent: 6
+          aliases: []
+          price_id: safrochain
