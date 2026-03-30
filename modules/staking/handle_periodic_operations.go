@@ -36,12 +36,6 @@ func (m *Module) UpdateStakingPool() error {
 	if err != nil {
 		return fmt.Errorf("error while getting latest block height: %s", err)
 	}
-
-	if block.IsEmpty() {
-		log.Debug().Str("module", "staking").Msg("skipping staking pool update: no blocks indexed yet")
-		return nil
-	}
-
 	log.Debug().Str("module", "staking").Int64("height", block.Height).
 		Msg("updating staking pool")
 
