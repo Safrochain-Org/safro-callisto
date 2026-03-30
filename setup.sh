@@ -220,8 +220,8 @@ start_callisto() {
   log "Use 'tail -f ${SCRIPT_DIR}/callisto.log' to follow progress"
   log ""
 
-  nohup "${SCRIPT_DIR}/build/callisto" start --home "$CALLISTO_HOME" \
-    > "${SCRIPT_DIR}/callisto.log" 2>&1 &
+  ( cd "$CALLISTO_HOME" && nohup "${SCRIPT_DIR}/build/callisto" start --home "$CALLISTO_HOME" \
+    > "${SCRIPT_DIR}/callisto.log" 2>&1 ) &
 
   CALLISTO_PID=$!
   echo "$CALLISTO_PID" > "${SCRIPT_DIR}/callisto.pid"

@@ -156,7 +156,7 @@ sudo cp /opt/safro-callisto/deploy/systemd/callisto.service.example /etc/systemd
 Edit both files and set:
 
 - **`User=` / `Group=`** → your deploy user  
-- **`WorkingDirectory=`** and paths → `/opt/safro-callisto` if you used that layout  
+- **`WorkingDirectory=`** → `/opt/safro-callisto/.callisto` (matches `parsing.genesis_file_path: genesis.json`); **`ExecStart`** paths → `/opt/safro-callisto` for the binary  
 
 Enable and start **Docker stack first**, then Callisto:
 

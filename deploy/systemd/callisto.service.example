@@ -6,6 +6,7 @@
 # sudo systemctl enable --now callisto.service
 #
 # Ensure .callisto/config.yaml database URL matches Docker Postgres (127.0.0.1:5434).
+# WorkingDirectory = --home so parsing.genesis_file_path: genesis.json resolves next to config.yaml.
 
 [Unit]
 Description=Safro Callisto chain indexer
@@ -17,7 +18,7 @@ Wants=network-online.target
 [Service]
 User=deploy
 Group=deploy
-WorkingDirectory=/opt/safro-callisto
+WorkingDirectory=/opt/safro-callisto/.callisto
 EnvironmentFile=-/opt/safro-callisto/.env
 ExecStart=/opt/safro-callisto/build/callisto start --home /opt/safro-callisto/.callisto
 Restart=on-failure

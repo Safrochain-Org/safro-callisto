@@ -13,6 +13,9 @@ import (
 // ErrNoBlocksSaved is returned when the block table is empty (before the first block is indexed).
 var ErrNoBlocksSaved = errors.New("cannot get block, no blocks saved")
 
+// ErrNoGenesisRows is returned when the genesis row has not been written yet (height 0 not processed).
+var ErrNoGenesisRows = errors.New("no rows inside the genesis table")
+
 // GetLastBlock returns the last block stored inside the database based on the heights
 func (db *Db) GetLastBlock() (*dbtypes.BlockRow, error) {
 	stmt := `SELECT * FROM block ORDER BY height DESC LIMIT 1`
@@ -186,7 +189,7 @@ func (db *Db) GetGenesis() (*types.Genesis, error) {
 	}
 
 	if len(rows) == 0 {
-		return nil, fmt.Errorf("no rows inside the genesis table")
+		return nil, ErrNoGenesisRows
 	}
 
 	row := rows[0]

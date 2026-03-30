@@ -195,7 +195,7 @@ ensure_binary() {
 cmd_start() {
   require_for_callisto_run
   ensure_binary
-  cd "${ROOT}"
+  cd "${CALLISTO_HOME}"
   exec "$CALLISTO_BIN" start --home "$CALLISTO_HOME"
 }
 
@@ -205,7 +205,7 @@ cmd_start_bg() {
   mkdir -p "${LOG_DIR}"
   echo "Appending to ${LOG_FILE}"
   (
-    cd "${ROOT}"
+    cd "${CALLISTO_HOME}"
     "$CALLISTO_BIN" start --home "$CALLISTO_HOME" 2>&1 | tee -a "${LOG_FILE}"
   ) &
   local pid=$!

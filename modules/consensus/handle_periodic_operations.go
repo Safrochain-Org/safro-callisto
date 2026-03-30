@@ -3,6 +3,7 @@ package consensus
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
@@ -51,6 +52,9 @@ func (m *Module) updateBlockTimeInMinute() error {
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 
@@ -88,6 +92,9 @@ func (m *Module) updateBlockTimeInHour() error {
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 
@@ -125,6 +132,9 @@ func (m *Module) updateBlockTimeInDay() error {
 
 	genesis, err := m.db.GetGenesis()
 	if err != nil {
+		if errors.Is(err, database.ErrNoGenesisRows) || strings.Contains(err.Error(), "no rows inside the genesis table") {
+			return nil
+		}
 		return fmt.Errorf("error while getting genesis: %s", err)
 	}
 
