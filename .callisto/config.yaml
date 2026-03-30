@@ -15,6 +15,7 @@ chain:
     - gov
     - feegrant
     - upgrade
+    - telemetry
     - actions
 
 node:
@@ -37,7 +38,7 @@ parsing:
   listen_new_blocks: true
   parse_old_blocks: true
   parse_genesis: true
-  start_height: 1000000
+  start_height: 9979256
   fast_sync: false
   average_block_time: 3s
 
@@ -51,8 +52,12 @@ database:
   partition_batch: 1000
 
 logging:
+  # Set to `debug` for per-block logs during catch-up (very noisy). Prefer `info` + telemetry/DB for progress.
   level: info
   format: text
+
+telemetry:
+  port: 9090
 
 actions:
   host: 127.0.0.1
