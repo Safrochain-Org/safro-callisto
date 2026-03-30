@@ -114,13 +114,20 @@ From `/opt/safro-callisto`:
 docker compose -f docker-compose.yml -f deploy/docker-compose.production.yml --env-file .env up -d
 ```
 
-The base `docker-compose.yml` does **not** publish host ports; `deploy/docker-compose.production.yml` maps **127.0.0.1:5434** and **127.0.0.1:8080** only (avoiding duplicate port bindings when merging files). For local dev, use `docker-compose.dev.yml` (see `./scripts/dev-stack.sh`).
+`deploy/docker-compose.production.yml` maps **127.0.0.1:5434** (Postgres) and **127.0.0.1:8080** (Hasura). For local dev, use `docker-compose.dev.yml` (see `./scripts/dev-stack.sh`).
 
 Verify:
 
 ```bash
 docker ps
 curl -sS http://127.0.0.1:8080/healthz
+```
+
+**Apply PostgreSQL schema (required before the first `callisto start`):** Callisto expects tables such as `modules` to exist. Install the **`psql` client** on the host if needed (`postgresql-client` on Debian/Ubuntu). After Postgres is reachable from the host:
+
+```bash
+# Uses .env for POSTGRES_*; default in migrate-db.sh is 127.0.0.1:5434 (production Docker bind)
+./scripts/migrate-db.sh
 ```
 
 **First-time (or after metadata changes):** apply Hasura metadata (needs [Hasura CLI](https://hasura.io/docs/latest/hasura-cli/install-hasura-cli/)):

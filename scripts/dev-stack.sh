@@ -159,6 +159,8 @@ cmd_reset() {
   echo "Docker: starting Postgres + Hasura..."
   ${COMPOSE} up -d
   wait_postgres
+  echo "Applying database schema (database/schema/*.sql)..."
+  "${ROOT}/scripts/migrate-db.sh"
   wait_hasura
   sleep 2
   echo "Applying Hasura metadata..."

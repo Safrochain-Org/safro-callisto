@@ -17,6 +17,8 @@ created using [Hasura](https://hasura.io/).
 
 The repo includes **`.callisto/config.yaml`** (defaults match `docker-compose` Postgres on `localhost:5434`). Edit RPC/gRPC, `database.url`, and `parsing.start_height` as needed (see `docs/INDEXER-SYNC.md`). You can copy **`.callisto/config.yaml.example`** if you want a backup before editing.
 
+**Before the first `callisto start`**, create tables with **`./scripts/migrate-db.sh`** (loads `POSTGRES_*` from `.env`; defaults to `127.0.0.1:5434` for Docker). Without this, `callisto` exits with `relation "modules" does not exist`.
+
 From this directory:
 
 | Command | What it does |

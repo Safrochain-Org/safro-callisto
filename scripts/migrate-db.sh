@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
+# Apply SQL schema under database/schema/*.sql (required before first `callisto start`).
+# Sources repo `.env` when present — set POSTGRES_HOST=127.0.0.1 and POSTGRES_PORT=5434 for Docker production.
 set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ -f "${ROOT}/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT}/.env"
+  set +a
+fi
 
 DB_USER="${POSTGRES_USER:-callisto}"
 DB_PASS="${POSTGRES_PASSWORD:-password}"
 DB_NAME="${POSTGRES_DB:-callisto}"
-DB_HOST="${POSTGRES_HOST:-localhost}"
-DB_PORT="${POSTGRES_PORT:-5432}"
+DB_HOST="${POSTGRES_HOST:-127.0.0.1}"
+DB_PORT="${POSTGRES_PORT:-5434}"
 
 export PGPASSWORD="$DB_PASS"
 
