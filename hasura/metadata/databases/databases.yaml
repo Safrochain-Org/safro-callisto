@@ -11,5 +11,6 @@
         max_connections: 50
         retries: 1
       use_prepared_statements: true
-  tables: "!include callisto/tables/tables.yaml"
-  functions: "!include callisto/functions/functions.yaml"
+  # On-disk folder is still `bdjuno` (Big Dipper / BDJuno naming); logical source name is `callisto`.
+  tables: "!include bdjuno/tables/tables.yaml"
+  functions: "!include bdjuno/functions/functions.yaml"
