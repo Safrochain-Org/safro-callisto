@@ -68,6 +68,20 @@ Easiest: run **`./scripts/hasura-metadata-apply.sh`** from `safro-callisto` (no 
 - **Gov genesis**: Strips gov JSON keys added in newer SDKs (e.g. `constitution`, extra `params` fields) before codec decode.
 - **Wasm txs**: Registers `CosmWasm/wasmd` `AppModuleBasic` so `MsgExecuteContract` (and related) unpack in Juno’s tx decoder.
 - **Staking voting power / status**: Avoids zero-value rows when skipping unknown validators; dedupes batch inserts so PostgreSQL `ON CONFLICT` is not hit twice in one statement.
+- **Tx/message partitions**: `SaveTx` / `SaveMessage` tolerate concurrent `CREATE TABLE … PARTITION` races when `parsing.workers` &gt; 1 (see `database/save_tx_partition.go`).
+
+## Troubleshooting (errors in `journalctl`)
+
+### `could not find results for height #…` / RPC `-32603`
+
+The public RPC may **not retain `block_results`** for that height (pruned or limited retention). **Fix** one of:
+
+- Point **`node.config.rpc`** (and gRPC if needed) at an **archive** endpoint that serves that height; or
+- Raise **`parsing.start_height`** so you only sync **recent** blocks (e.g. `UPDATE_START_HEIGHT=1 ./scripts/bump-start-height.sh` with a small `START_HEIGHT_OFFSET` so `start_height` stays inside the pruning window).
+
+### `relation "transaction_N" already exists`
+
+Usually a **race** from multiple workers creating the same list partition. This fork **ignores** duplicate-partition errors in `database/save_tx_partition.go`. If you still see issues, set **`parsing.workers: 1`** temporarily.
 
 
 ./scripts/dev-stack.sh all	Stops Callisto → docker compose … down -v (drops DB volume) → up -d (base + docker-compose.dev.yml) → waits for Postgres & Hasura → hasura metadata apply → starts Callisto in the background and appends logs/callisto-sync.log
