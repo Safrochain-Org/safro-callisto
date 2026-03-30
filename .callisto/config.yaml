@@ -45,7 +45,7 @@ parsing:
 database:
   # Password must match POSTGRES_PASSWORD used with scripts/reset-db.sh AND .env (Hasura).
   # Use 127.0.0.1 if localhost resolves differently for libpq on your host.
-  url: postgres://callisto:password@127.0.0.1:5432/callisto?sslmode=disable&search_path=public
+  url: postgres://callisto:password@127.0.0.1:5434/callisto?sslmode=disable&search_path=public
   max_open_connections: 10
   max_idle_connections: 10
   partition_size: 100000

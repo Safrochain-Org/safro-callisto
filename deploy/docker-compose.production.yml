@@ -18,7 +18,7 @@ services:
     environment:
       HASURA_GRAPHQL_DEV_MODE: "false"
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET:-changeme}
       # Callisto actions on the host (Linux Docker: host-gateway)
       ACTION_BASE_URL: http://host.docker.internal:3001
     extra_hosts:

@@ -1,24 +1,47 @@
-# Hasura only — Postgres runs on the host (see scripts/setup-db.sh).
+# Postgres + Hasura on the default Docker network. Callisto runs on the host and connects to
+# 127.0.0.1:5434 when using `deploy/docker-compose.production.yml` (published port).
 # GraphQL: http://127.0.0.1:8080
 #
-# Linux VM: if `curl http://127.0.0.1:8080/v1/version` fails after `up -d`, use:
+# Linux VM: if Hasura cannot reach the DB, try:
 #   docker compose -f docker-compose.yml -f deploy/docker-compose.hasura-hostnetwork.yml --env-file .env up -d
+# (host Postgres on 127.0.0.1:5432 instead of the `postgres` service below.)
 
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: safro-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-callisto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-callisto}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-callisto} -d ${POSTGRES_DB:-callisto}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   hasura:
     image: hasura/graphql-engine:v2.0.4
     container_name: safro-hasura
-    # Linux: without this, host.docker.internal is undefined → DB connect fails → container exits → :8080 refused
+    depends_on:
+      postgres:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:8080:8080"
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER:-callisto}:${POSTGRES_PASSWORD:-password}@host.docker.internal:5432/${POSTGRES_DB:-callisto}
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER:-callisto}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-callisto}
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET:-myadminsecretkey}
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET:-changeme}
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       ACTION_BASE_URL: http://host.docker.internal:3001
     restart: always
+
+volumes:
+  postgres_data:
