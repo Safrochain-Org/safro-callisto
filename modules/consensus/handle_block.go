@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/forbole/callisto/v4/database"
+	junotypes "github.com/forbole/juno/v5/types"
 
 	"github.com/rs/zerolog/log"
 
@@ -14,7 +15,7 @@ import (
 
 // HandleBlock implements modules.Module
 func (m *Module) HandleBlock(
-	b *tmctypes.ResultBlock, _ *tmctypes.ResultBlockResults, _ []*types.Tx, _ *tmctypes.ResultValidators,
+	b *tmctypes.ResultBlock, _ *tmctypes.ResultBlockResults, _ []*junotypes.Tx, _ *tmctypes.ResultValidators,
 ) error {
 	err := m.updateBlockTimeFromGenesis(b)
 	if err != nil {
