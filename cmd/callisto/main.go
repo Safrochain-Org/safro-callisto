@@ -3,6 +3,10 @@ package main
 import (
 	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
+	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
+	ibctransfer "github.com/cosmos/ibc-go/v7/modules/apps/transfer"
+	ibc "github.com/cosmos/ibc-go/v7/modules/core"
 	"github.com/forbole/juno/v5/cmd"
 	initcmd "github.com/forbole/juno/v5/cmd/init"
 	parsetypes "github.com/forbole/juno/v5/cmd/parse/types"
@@ -57,7 +61,20 @@ func main() {
 func getBasicManagers() []module.BasicManager {
 	return []module.BasicManager{
 		simapp.ModuleBasics,
-		module.NewBasicManager(wasm.AppModuleBasic{}),
+		module.NewBasicManager(
+			wasm.AppModuleBasic{},
+			// Register IBC-go module basics so the codec can unpack IBC
+			// messages like /ibc.core.client.v1.MsgUpdateClient,
+			// /ibc.core.client.v1.MsgCreateClient and
+			// /ibc.applications.transfer.v1.MsgTransfer. Without these,
+			// any block containing IBC txs fails to be indexed with
+			// "no concrete type registered for type URL ... against
+			// interface *types.Msg".
+			ibc.AppModuleBasic{},
+			ibctransfer.AppModuleBasic{},
+			ica.AppModuleBasic{},
+			ibcfee.AppModuleBasic{},
+		),
 	}
 }
 
