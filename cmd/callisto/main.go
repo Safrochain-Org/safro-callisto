@@ -7,6 +7,8 @@ import (
 	ibcfee "github.com/cosmos/ibc-go/v7/modules/apps/29-fee"
 	ibctransfer "github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
+	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
+	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/forbole/juno/v5/cmd"
 	initcmd "github.com/forbole/juno/v5/cmd/init"
 	parsetypes "github.com/forbole/juno/v5/cmd/parse/types"
@@ -64,16 +66,19 @@ func getBasicManagers() []module.BasicManager {
 		module.NewBasicManager(
 			wasm.AppModuleBasic{},
 			// Register IBC-go module basics so the codec can unpack IBC
-			// messages like /ibc.core.client.v1.MsgUpdateClient,
-			// /ibc.core.client.v1.MsgCreateClient and
-			// /ibc.applications.transfer.v1.MsgTransfer. Without these,
-			// any block containing IBC txs fails to be indexed with
-			// "no concrete type registered for type URL ... against
-			// interface *types.Msg".
+			// messages and their Any-typed payloads. Without these,
+			// blocks containing IBC txs fail to be indexed with errors like
+			// "no concrete type registered for type URL ..." or
+			// "no registered implementations of type exported.ClientMessage".
 			ibc.AppModuleBasic{},
 			ibctransfer.AppModuleBasic{},
 			ica.AppModuleBasic{},
 			ibcfee.AppModuleBasic{},
+			// Light-client implementations. MsgUpdateClient/MsgCreateClient
+			// carry an Any whose concrete type is the chain's light client
+			// (e.g. /ibc.lightclients.tendermint.v1.ClientState / Header).
+			ibctm.AppModuleBasic{},
+			solomachine.AppModuleBasic{},
 		),
 	}
 }
